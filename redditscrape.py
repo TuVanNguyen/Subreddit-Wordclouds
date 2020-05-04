@@ -48,7 +48,13 @@ class Scraper:
         attrs = {'class': 'thing', 'data-domain': domain}
         data = {'data' : []}
         for post in soup.find_all('div', attrs=attrs):
-            title = post.find('p', class_="title").text
+            title = post.find('p', class_="title")
+            if title.find('span', class_="linkflairlabel"):
+                flair = title.find('span', class_="linkflairlabel").text
+                title = title.text.replace(flair," ")
+            else:
+                title = title.text
+            print(title)
             comments= post.find('a', class_='comments').text
             comments = post.find('a', class_='comments').text.split()[0]
             if comments == "comment":
@@ -65,7 +71,6 @@ class Scraper:
                 'comments': comments,
                 'content': post_content
             })
-            print(title)
             time.sleep(2)
         return data
 
@@ -75,7 +80,7 @@ class Scraper:
         soup = BeautifulSoup(page.text, 'html.parser')
         post = soup.find('div', class_='thing')
         post_content = ""
-        post_content = post.find('div', class_='usertext-body')
+        post_content = post.find('div', class_='usertext-body') if post != None else None
         post_content = post_content.text if post_content != None else "" #in case post has no content
         return post_content
 
