@@ -8,8 +8,6 @@ Created on Mon May  4 09:29:19 2020
 #Reference: https://www.datacamp.com/community/tutorials/wordcloud-python
 
 import preprocess
-import numpy as np
-from PIL import Image
 from wordcloud import WordCloud, STOPWORDS
 import sys
 import matplotlib.pyplot as plt
@@ -22,7 +20,6 @@ class MyWordCloud:
         self.outputfile = "wordmaps/"+subreddit+".png"
     def generate(self):
         mystopwords = set(STOPWORDS)
-        mask = np.array(Image.open("snoo.png"))
         self.wordcloud = WordCloud(stopwords=mystopwords).generate(self.text)
         plt.imshow(self.wordcloud, interpolation = 'bilinear')
         plt.axis("off")
