@@ -23,9 +23,7 @@ class MyWordCloud:
         self.wordcloud = WordCloud(stopwords=mystopwords).generate(self.text)
         plt.imshow(self.wordcloud, interpolation = 'bilinear')
         plt.axis("off")
-        plt.figure()
         plt.savefig(self.outputfile, format="png")
-        #plt.imshow(mask)
         plt.show()
     
 if __name__ == "__main__":

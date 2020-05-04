@@ -6,10 +6,13 @@ Created on Sun May  3 17:17:36 2020
 @author: tuvan
 """
 #Reference: https://www.kdnuggets.com/2019/04/text-preprocessing-nlp-machine-learning.html
+#Reference: https://www.datacamp.com/community/tutorials/stemming-lemmatization-python
 
 import pandas as pd
 import re
+import nltk
 from nltk.corpus import stopwords
+from nltk.stem import WordNetLemmatizer
 import json
 import sys
 
@@ -70,10 +73,31 @@ class Preprocessor:
         #self.text = "".join()
         mystopwords = stopwords.words('english')
         morestops = ["(self."+self.subreddit.lower()+")", "also", "like",
-                     "would","much", "still", "thing", "things", "something"]
+                     "would","much", "still", "thing", "things", "something",
+                     "lot", "really", "around", "always", "say", "even", "well",
+                     "one", "anyone", "already", "within", "yet", "upon", "towards",
+                     "please", "may", "someone", "anything", "maybe"]
         mystopwords += morestops
         
         self.text = "".join(word+" " for word in words if word not in mystopwords)
+
+    def lemmatize(self):
+        """
+        Description
+        -------
+        removes punctuation
+        
+        Returns
+        -------
+        None.
+
+        """
+        wordnet_lemmatizer = WordNetLemmatizer()
+        sentence_words = nltk.word_tokenize(self.text)
+        lematized_string = "".join(wordnet_lemmatizer.lemmatize(word,pos="v")+" " for word in sentence_words)
+        self.text = lematized_string
+        #print(sentence_words)
+
         
     def clean(self):
         self.aggregate()
@@ -81,7 +105,8 @@ class Preprocessor:
         self.remove_stopwords()
         self.remove_noise()
         self.remove_stopwords()
-    
+        self.lemmatize()
+        
 if __name__ == "__main__":
     """
     Inputs:
