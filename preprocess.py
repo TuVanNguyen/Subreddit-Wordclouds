@@ -22,6 +22,7 @@ class Preprocessor:
         self.subreddit = filename[5:-5] 
         self.data = None
         self.text = ""
+        self.titles_only = ""
     
     def aggregate(self):
         """
@@ -39,8 +40,9 @@ class Preprocessor:
         
         df = pd.DataFrame(self.data['data'][1])
         self.text = "".join(post_title+ "\n"+ post_content for post_title, post_content in zip(df.title,df.content))
+        self.titles_only = "".join(post_title+ "\n" for post_title in df.title)
     
-    def lowercase(self):
+    def lowercase(self,text):
         """
         Description
         -------
@@ -51,9 +53,10 @@ class Preprocessor:
         None.
 
         """
-        self.text = self.text.lower()
+        text = text.lower()
+        return text
     
-    def remove_noise(self):
+    def remove_noise(self,text):
         """
         Description
         -------
@@ -64,24 +67,27 @@ class Preprocessor:
         None.
 
         """
-        self.text = re.sub(r'[^\w\s]',' ',self.text)
-        self.text = re.sub(r' r ', ' r/',self.text)
-        
-    def remove_stopwords(self):
-        words = self.text.split()
+        text = re.sub(r'[^\w\s]',' ',text)
+        text = re.sub(r' r ', ' r/',text)
+        return text
+
+
+    def remove_stopwords(self,text):
+        words = text.split()
         #print(stopwords.words('english'))
         #self.text = "".join()
         mystopwords = stopwords.words('english')
         morestops = ["(self."+self.subreddit.lower()+")", "also", "like",
                      "would","much", "still", "thing", "things", "something",
-                     "lot", "really", "around", "always", "say", "even", "well",
+                     "lot", "really", "around", "always", "even", "well",
                      "one", "anyone", "already", "within", "yet", "upon", "towards",
                      "please", "may", "someone", "anything", "maybe"]
         mystopwords += morestops
         
-        self.text = "".join(word+" " for word in words if word not in mystopwords)
+        text = "".join(word+" " for word in words if word not in mystopwords)
+        return text
 
-    def lemmatize(self):
+    def lemmatize(self,text):
         """
         Description
         -------
@@ -93,19 +99,27 @@ class Preprocessor:
 
         """
         wordnet_lemmatizer = WordNetLemmatizer()
-        sentence_words = nltk.word_tokenize(self.text)
+        sentence_words = nltk.word_tokenize(text)
         lematized_string = "".join(wordnet_lemmatizer.lemmatize(word,pos="v")+" " for word in sentence_words)
-        self.text = lematized_string
+        text = lematized_string
+        return text
         #print(sentence_words)
 
         
     def clean(self):
         self.aggregate()
-        self.lowercase()
-        self.remove_stopwords()
-        self.remove_noise()
-        self.remove_stopwords()
-        self.lemmatize()
+        
+        self.text = self.lowercase(self.text)
+        self.text = self.remove_stopwords(self.text)
+        self.text = self.remove_noise(self.text)
+        self.text = self.remove_stopwords(self.text)
+        self.text = self.lemmatize(self.text)
+        
+        self.titles_only = self.lowercase(self.titles_only)
+        self.titles_only = self.remove_stopwords(self.titles_only)
+        self.titles_only = self.remove_noise(self.titles_only)
+        #self.titles_only= self.remove_stopwords(self.titles_only)
+        self.titles_only = self.lemmatize(self.titles_only)
         
 if __name__ == "__main__":
     """
@@ -116,4 +130,4 @@ if __name__ == "__main__":
     filename =  sys.argv[1]
     subreddit_preprocessor = Preprocessor(filename)
     subreddit_preprocessor.clean()
-    print(subreddit_preprocessor.text)
+    print(subreddit_preprocessor.titles_only)
