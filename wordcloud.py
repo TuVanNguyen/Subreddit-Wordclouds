@@ -23,13 +23,11 @@ class MyWordCloud:
     def generate(self):
         mystopwords = set(STOPWORDS)
         mask = np.array(Image.open("snoo.png"))
-        self.wordcloud = WordCloud(stopwords=mystopwords, mask=mask,
-                                   background_color="white",mode="RGBA",
-                                   max_words=1000).generate(self.text)
+        self.wordcloud = WordCloud(stopwords=mystopwords).generate(self.text)
         plt.imshow(self.wordcloud, interpolation = 'bilinear')
         plt.axis("off")
         plt.figure()
-        #plt.savefig(self.outputfile, format="png")
+        plt.savefig(self.outputfile, format="png")
         #plt.imshow(mask)
         plt.show()
     
